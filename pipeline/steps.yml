@@ -1,4 +1,15 @@
-
+jobs:
+- job: OpenEmbedded_Build_And_Export
+  container: smartracks-build
+  timeoutInMinutes: 3600
+  workspace:
+     clean: all
+  pool:
+    name: Drivers-NIBuildFarm-RFMIBUILD
+    demands:
+      - docker
+      - Agent.OS -equals Linux
+      
   steps:
   - checkout: rcu-service
   - checkout: meta-smartracks
