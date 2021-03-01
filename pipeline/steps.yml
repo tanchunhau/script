@@ -40,8 +40,33 @@ jobs:
       echo "EXTERNALSRC_pn-rcu-service = \"$(Build.SourcesDirectory)/rcu-service\"" >> $(Build.SourcesDirectory)/smartracks-manifest/build/conf/local.conf
       #bitbake rcu-service 
       bitbake smartracks-minimal-image
+      bitbake package-index
+      
       cd deploy/images/apalis-imx8x-smartracks
       mkdir build-$(Build.BuildNumber)
       #cp deploy/images/apalis-imx8x-smartracks/$(find . -name 'Apalis-iMX8X-SmartRacks_Reference-Minimal-Image-rt-Tezi_*.tar') build-$(Build.BuildNumber)
       cp $(find -name 'Apalis-iMX8X-SmartRacks_Reference-Minimal-Image-rt-Tezi_*.tar') build-$(Build.BuildNumber)
-      cp -R build-$(Build.BuildNumber) /mnt/nirvana/perforceExports/smartracks/testing123
+      cp -R build-$(Build.BuildNumber) /mnt/nirvana/perforceExports/smartracks/development
+      
+      # go back to deploy directory
+      # create feedversion.txt in feed-$(Build.BuildNumber) to clarify feed version
+      cd ../..
+      mkdir feed-$(Build.BuildNumber)
+      echo $(Build.BuildNumber) > feed-$(Build.BuildNumber)/feedversion.txt
+      
+      # copy all files in deploy/ipk to feed-$(Build.BuildNumber)
+      # copy feed-$(Build.BuildNumber) to perforce
+      cp ipk/* feed-$(Build.BuildNumber)
+      cp -R feed-$(Build.BuildNumber) /mnt/nirvana/perforceExports/smartracks/development
+      
+      # delete latestfeed, then repopulate latestfeed with latest ipk exports
+      # this means opkg.conf points to nirvana/perforceExports/smartracks/development/latestfeed/aarch64, etc
+      rm -rf /mnt/nirvana/perforceExports/smartracks/development/latestfeed
+      mkdir /mnt/nirvana/perforceExports/smartracks/development/latestfeed
+      cp /mnt/nirvana/perforceExports/smartracks/development/feed-$(Build.BuildNumber)/* /mnt/nirvana/perforceExports/smartracks/development/latestfeed
+      
+      bitbake smartracks-minimal-image -c populate_sdk
+      
+      mkdir sdk-$(Build.BuildNumber)
+      cp sdk/* sdk-$(Build.BuildNumber)
+      cp -R sdk-$(Build.BuildNumber) /mnt/nirvana/perforceExports/smartracks/development
