@@ -56,14 +56,14 @@ jobs:
       
       # copy all files in deploy/ipk to feed-$(Build.BuildNumber)
       # copy feed-$(Build.BuildNumber) to perforce
-      cp ipk/* feed-$(Build.BuildNumber)
+      cp -R ipk/* feed-$(Build.BuildNumber)
       cp -R feed-$(Build.BuildNumber) /mnt/nirvana/perforceExports/smartracks/development
       
       # delete latestfeed, then repopulate latestfeed with latest ipk exports
       # this means opkg.conf points to nirvana/perforceExports/smartracks/development/latestfeed/aarch64, etc
       rm -rf /mnt/nirvana/perforceExports/smartracks/development/latestfeed
       mkdir /mnt/nirvana/perforceExports/smartracks/development/latestfeed
-      cp /mnt/nirvana/perforceExports/smartracks/development/feed-$(Build.BuildNumber)/* /mnt/nirvana/perforceExports/smartracks/development/latestfeed
+      cp -R /mnt/nirvana/perforceExports/smartracks/development/feed-$(Build.BuildNumber)/* /mnt/nirvana/perforceExports/smartracks/development/latestfeed
       
       bitbake smartracks-minimal-image -c populate_sdk
       
