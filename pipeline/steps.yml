@@ -45,7 +45,7 @@ jobs:
        #--- Create export directories ---
       cd $(Build.SourcesDirectory)/smartracks-manifest/build
       mkdir $(Build.BuildNumber)
-	
+
       cd $(Build.SourcesDirectory)/smartracks-manifest/build/deploy/images/apalis-imx8x-smartracks
       mkdir image
       cp $(find . -name 'Apalis-iMX8X-SmartRacks_Reference-Minimal-Image-rt-Tezi_*.tar') image
