@@ -42,25 +42,28 @@ jobs:
       bitbake smartracks-minimal-image
       bitbake package-index
       
-      cd deploy/images/apalis-imx8x-smartracks
-      mkdir build-$(Build.BuildNumber)
-      #cp deploy/images/apalis-imx8x-smartracks/$(find . -name 'Apalis-iMX8X-SmartRacks_Reference-Minimal-Image-rt-Tezi_*.tar') build-$(Build.BuildNumber)
-      cp $(find -name 'Apalis-iMX8X-SmartRacks_Reference-Minimal-Image-rt-Tezi_*.tar') build-$(Build.BuildNumber)
-      cp -R build-$(Build.BuildNumber) /mnt/nirvana/perforceExports/smartracks/development
+       #--- Create export directories ---
+      cd $(Build.SourcesDirectory)/smartracks-manifest/build
+      mkdir $(Build.BuildNumber)
+	
+      cd $(Build.SourcesDirectory)/smartracks-manifest/build/deploy/images/apalis-imx8x-smartracks
+      mkdir image
+      cp $(find . -name 'Apalis-iMX8X-SmartRacks_Reference-Minimal-Image-rt-Tezi_*.tar') image
+      cp -R image $(Build.SourcesDirectory)/smartracks-manifest/build/$(Build.BuildNumber)
       
-      # go back to deploy directory
-      # create feedversion.txt in feed-$(Build.BuildNumber) to clarify feed version
-      cd ../..
-      mkdir feed-$(Build.BuildNumber)
-      echo $(Build.BuildNumber) > feed-$(Build.BuildNumber)/feedversion.txt
+      #--- Go back to deploy directory amd create feedversion.txt in feed to clarify feed version ---
+      cd $(Build.SourcesDirectory)/smartracks-manifest/build/deploy
+      mkdir feed
+      echo $(Build.BuildNumber) > feed/feedversion.txt
       
-      # copy all files in deploy/ipk to feed-$(Build.BuildNumber)
-      # copy feed-$(Build.BuildNumber) to perforce
-      cp -R ipk/* feed-$(Build.BuildNumber)
-      cp -R feed-$(Build.BuildNumber) /mnt/nirvana/perforceExports/smartracks/development
+      #--- Copy all files in deploy/ipk to feed, then copy feed to the $(Build.BuildNumber)---
+      cp -R ipk/* feed
+      cp -R feed $(Build.SourcesDirectory)/smartracks-manifest/build/$(Build.BuildNumber)
       
+      #--- Copy all files sdk to the $(Build.BuildNumber)---
       bitbake smartracks-minimal-image -c populate_sdk
-      
-      mkdir sdk-$(Build.BuildNumber)
-      cp sdk/* sdk-$(Build.BuildNumber)
-      cp -R sdk-$(Build.BuildNumber) /mnt/nirvana/perforceExports/smartracks/development
+      cd $(Build.SourcesDirectory)/smartracks-manifest/build/deploy/
+      cp -R sdk $(Build.SourcesDirectory)/smartracks-manifest/build/$(Build.BuildNumber)
+
+      #--- Export to NI-Server---
+      cp -R $(Build.SourcesDirectory)/smartracks-manifest/build/$(Build.BuildNumber) /mnt/nirvana/perforceExports/smartracks/rcuimage/1.0/
